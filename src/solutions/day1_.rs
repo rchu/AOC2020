@@ -1,9 +1,9 @@
-use std::{collections::HashMap};
+use std::{collections::{HashMap, HashSet}};
 
 pub fn day01(input: &Vec<String>) -> Option<String> {
     let numbers: Vec<u32> = input
     .into_iter()
-    .map(|x|{x.parse::<u32>().expect("cannot covert input into u32")})
+    .map(|x|{x.parse::<u32>().expect("cannot convert input into u32")})
     .collect();
     
     let mut answer1 =  0u32;
@@ -153,19 +153,7 @@ pub fn day04(input: &Vec<String>) -> Option<String> {
 }
 
 pub fn day05(input: &Vec<String>) -> Option<String> {
-    // B = 1, F = 0
-    // R = 1, L = 0
-    // BFFFBBFRRR = 567 ==> BFFFBBF = row 70 = 567>>3; RRR = seat 7 = 567 xor 0000000111
     let mut max_seat_id: i32 = 0;
-
-    // for line in input {
-    //     let mut number: i32 = 0;
-    //     for chr in line.chars().into_iter().map(|x| (x == 'B')||(x=='R')) {
-    //         number = (number << 1) | chr as i32;
-    //     }
-    //     if number > max_seat_id { max_seat_id = number; }
-    // }
-    
     let seats: Vec<i32> = input.iter().map( |line| {
         let mut number: i32 = 0;
         for chr in line.chars().into_iter().map(|x| (x == 'B')||(x=='R')) {
@@ -182,4 +170,27 @@ pub fn day05(input: &Vec<String>) -> Option<String> {
     };
 
     Some(format!("{},{}",max_seat_id, my_seat_id))
+}
+
+pub fn day06(input: &Vec<String>) -> Option<String> {
+    const ALPHABET: [char; 26] = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    let mut input_iter = input.iter();
+    let mut any_sum = 0;
+    let mut all_sum = 0;
+    let mut any_yes = HashSet::new();
+    let mut all_yes = Vec::from(ALPHABET);
+    loop {
+        let line = input_iter.next();
+        if line == Some(&String::from("")) || line == None {
+            any_sum += any_yes.len();
+            all_sum += all_yes.len();
+            any_yes.clear();
+            all_yes = Vec::from(ALPHABET);
+            if line == None { break; }
+        } else {
+            line.unwrap().chars().for_each( |x| { any_yes.insert(x); } );
+            all_yes = line.unwrap().chars().filter( |x| all_yes.contains(x) ).collect();
+        }
+    }
+    Some(format!("{},{}", any_sum, all_sum))
 }

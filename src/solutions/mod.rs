@@ -11,6 +11,7 @@ impl Puzzle {
             3 => day1_::day03(&self.input),
             4 => day1_::day04(&self.input),
             5 => day1_::day05(&self.input),
+            6 => day1_::day06(&self.input),
             _ => None,
         }
     }
