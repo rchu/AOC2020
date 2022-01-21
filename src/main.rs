@@ -16,7 +16,7 @@ impl Puzzle {
         Ok(Self {
             file: file_name.to_string(),
             day: if let Some(x) = lines.next() { x?.parse::<u8>()? } else { Err("Cannot read day; no lines in file")? },
-            answer: if let Some(x) = lines.next() { x.ok().filter(|s| s!="")} else { Err("No first line to read")? },
+            answer: if let Some(x) = lines.next() { x.ok().filter(|s| !s.is_empty())} else { Err("No first line to read")? },
             input: lines.into_iter().collect::<Result<Vec<String>, _>>()?,
             output: None,
         })  
@@ -38,7 +38,7 @@ impl Puzzle {
 fn main() {
     if env::args().into_iter().count() < 2 {
         println!("Please tell me which file(s) to look at");
-        ()
+        return;
     } 
     println!("\x1b[33m* \x1b[32mAdvent of Code\x1b[33m *\x1b[0m\n");    
     for filename in env::args().skip(1) {

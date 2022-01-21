@@ -1,10 +1,13 @@
-use std::{collections::{HashMap, HashSet}};
+use std::collections::HashSet;
+use std::collections::HashMap;
 
-pub fn day01(input: &Vec<String>) -> Option<String> {
+use super::between;
+
+pub fn day01(input: &[String]) -> Option<String> {
     let numbers: Vec<u32> = input
-    .into_iter()
-    .map(|x|{x.parse::<u32>().expect("cannot convert input into u32")})
-    .collect();
+        .iter()
+        .map(|x|{x.parse::<u32>().expect("cannot convert input into u32")})
+        .collect();
     
     let mut answer1 =  0u32;
     'outer1: for i1 in 0..numbers.len() {
@@ -31,7 +34,7 @@ pub fn day01(input: &Vec<String>) -> Option<String> {
    Some(format!("{},{}",answer1, answer2))
 }
 
-pub fn day02(input: &Vec<String>) -> Option<String> {
+pub fn day02(input: &[String]) -> Option<String> {
     let mut valid_count_1 = 0u16;
     let mut valid_count_2 = 0u16;
     for line in input {
@@ -44,13 +47,13 @@ pub fn day02(input: &Vec<String>) -> Option<String> {
                 num1 = line.get(0..i)
                     .unwrap()
                     .parse::<usize>()
-                    .expect(&format!("Invalid range_start 0..{} in line {}",i,line));
+                    .unwrap_or_else(|_| panic!("Invalid range_start 0..{} in line {}",i,line));
                 pos = i+1;
             } else if ch == ' ' {
                 num2 = line.get(pos..i)
                     .unwrap()
                     .parse::<usize>()
-                    .expect(&format!("Invalid range_end {}..{} in line {}",pos,i,line));
+                    .unwrap_or_else(|_| panic!("Invalid range_end {}..{} in line {}",pos,i,line));
                 chr = line.chars().nth(i+1).unwrap();
                 pos = i+3;
                 break;
@@ -65,30 +68,31 @@ pub fn day02(input: &Vec<String>) -> Option<String> {
     }
     Some(format!("{},{}",valid_count_1,valid_count_2))
 }
-struct Map {
-    map: Vec<Vec<char>>,
-    width: usize,
-    height: usize,
-}
-impl Map {
-    fn from(str_map:&Vec<String>) -> Self {
-        let char_map: Vec<Vec<char>> = str_map.into_iter().map(|x| x.chars().collect()).collect();
-        Self {
-            width: char_map[0].len(),
-            height: char_map.len(),
-            map: char_map,
+
+pub fn day03(input: &[String]) -> Option<String> {
+    struct Map {
+        map: Vec<Vec<char>>,
+        width: usize,
+        height: usize,
+    }
+    impl Map {
+        fn from(str_map:&[String]) -> Self {
+            let char_map: Vec<Vec<char>> = str_map.iter().map(|x| x.chars().collect()).collect();
+            Self {
+                width: char_map[0].len(),
+                height: char_map.len(),
+                map: char_map,
+            }
+        }
+        fn get(&self, x: usize, y: usize) -> Option<char> {
+            if y >= self.height {
+                None
+            } else {
+                Some(self.map[y][x % self.width])
+            }
         }
     }
-    fn get(&self, x: usize, y: usize) -> Option<char> {
-        if y >= self.height {
-            None
-        } else {
-            Some(self.map[y][x % self.width])
-        }
-    }
-}
-pub fn day03(input: &Vec<String>) -> Option<String> {
-    let map = Map::from(&input);
+    let map = Map::from(input);
     let slopes: Vec<usize> = [(1,1), (3,1), (5,1), (7,1), (1,2)]
         .into_iter()
         .map(|(dx,dy)| (1..map.height)
@@ -98,11 +102,7 @@ pub fn day03(input: &Vec<String>) -> Option<String> {
     Some(slopes[1].to_string() + "," + &slopes.into_iter().product::<usize>().to_string())
 }
 
-
-fn between<T:std::cmp::PartialOrd>(value: T, low: T, high: T) -> bool {
-    (low <= value) && (value <= high)
-}
-pub fn day04(input: &Vec<String>) -> Option<String> {
+pub fn day04(input: &[String]) -> Option<String> {
     let mut valid_count_1 = 0;
     let mut valid_count_2 = 0;
 
@@ -152,7 +152,7 @@ pub fn day04(input: &Vec<String>) -> Option<String> {
     Some(format!("{},{}",valid_count_1,valid_count_2))
 }
 
-pub fn day05(input: &Vec<String>) -> Option<String> {
+pub fn day05(input: &[String]) -> Option<String> {
     let mut max_seat_id: i32 = 0;
     let seats: Vec<i32> = input.iter().map( |line| {
         let mut number: i32 = 0;
@@ -172,7 +172,7 @@ pub fn day05(input: &Vec<String>) -> Option<String> {
     Some(format!("{},{}",max_seat_id, my_seat_id))
 }
 
-pub fn day06(input: &Vec<String>) -> Option<String> {
+pub fn day06(input: &[String]) -> Option<String> {
     const ALPHABET: [char; 26] = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
     let mut input_iter = input.iter();
     let mut any_sum = 0;
@@ -193,4 +193,43 @@ pub fn day06(input: &Vec<String>) -> Option<String> {
         }
     }
     Some(format!("{},{}", any_sum, all_sum))
+}
+
+
+pub fn day07(input: &[String]) -> Option<String> {
+    fn bag_contains_gold(rules: &HashMap<String,Vec<(i32,String)>>, bag: &str) -> bool {
+        for sub_bag in rules.get(bag).unwrap_or(&Vec::new()) {
+            if sub_bag.1 == "shiny gold" || bag_contains_gold(rules, &sub_bag.1) { return true; }
+        }
+        false
+    }
+    fn count_bags(rules: &HashMap<String,Vec<(i32,String)>>, bag: &str) -> i32 {
+        let mut count = 1;
+        for sub_bag in rules.get(bag).unwrap_or(&Vec::new()) {
+            count += sub_bag.0 * count_bags(rules, &sub_bag.1);
+        }
+        count
+    }
+    
+    let mut rules: HashMap<String,Vec<(i32,String)>> = HashMap::new();
+    for mut words in input.iter().map(|x| x.split(' ').peekable()) {
+        let bag = format!("{} {}",words.next()?, words.next()?);
+        let mut contain = Vec::<(i32,String)>::new();
+        words.next();
+        words.next();
+        while words.peek().is_some() {
+            if words.peek() == Some(&"no") { break; }
+            contain.push((
+                words.next().map(|x| x.parse::<i32>().expect("invalid number"))?,
+                format!("{} {}", words.next()?, words.next()?),
+            ));
+            words.next();
+        }
+        rules.insert(bag, contain);
+    };
+    
+    Some(format!("{},{}",
+        rules.keys().filter(|x| bag_contains_gold(&rules, x) ).count(),
+        count_bags(&rules, &String::from("shiny gold")) -1,
+    ))
 }
