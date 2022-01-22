@@ -3,13 +3,13 @@ use std::collections::HashMap;
 
 use super::between;
 
-pub fn day01(input: &[String]) -> Option<String> {
+pub fn day01(input: Vec<String>) -> (Option<String>, Option<String>) {
     let numbers: Vec<u32> = input
         .iter()
         .map(|x|{x.parse::<u32>().expect("cannot convert input into u32")})
         .collect();
     
-    let mut answer1 =  0u32;
+    let mut answer1 = 0u32;
     'outer1: for i1 in 0..numbers.len() {
         for i2 in (i1+1)..numbers.len() {
             if numbers[i1] + numbers[i2] == 2020 {
@@ -31,10 +31,10 @@ pub fn day01(input: &[String]) -> Option<String> {
         }
     }
 
-   Some(format!("{},{}",answer1, answer2))
+    (Some(answer1.to_string()), Some(answer2.to_string()))
 }
 
-pub fn day02(input: &[String]) -> Option<String> {
+pub fn day02(input: Vec<String>) -> (Option<String>, Option<String>) {
     let mut valid_count_1 = 0u16;
     let mut valid_count_2 = 0u16;
     for line in input {
@@ -66,10 +66,10 @@ pub fn day02(input: &[String]) -> Option<String> {
             (line.chars().nth(pos+num2  ).unwrap() == chr)
         ) as u16
     }
-    Some(format!("{},{}",valid_count_1,valid_count_2))
+    (Some(valid_count_1.to_string()), Some(valid_count_2.to_string()))
 }
 
-pub fn day03(input: &[String]) -> Option<String> {
+pub fn day03(input: Vec<String>) -> (Option<String>, Option<String>) {
     struct Map {
         map: Vec<Vec<char>>,
         width: usize,
@@ -92,17 +92,17 @@ pub fn day03(input: &[String]) -> Option<String> {
             }
         }
     }
-    let map = Map::from(input);
+    let map = Map::from(&input);
     let slopes: Vec<usize> = [(1,1), (3,1), (5,1), (7,1), (1,2)]
         .into_iter()
         .map(|(dx,dy)| (1..map.height)
             .filter(|&i| Some('#') == map.get(i*dx, i*dy) )
             .count()
         ).collect();
-    Some(slopes[1].to_string() + "," + &slopes.into_iter().product::<usize>().to_string())
+    (Some(slopes[1].to_string()), Some(slopes.into_iter().product::<usize>().to_string()))
 }
 
-pub fn day04(input: &[String]) -> Option<String> {
+pub fn day04(input: Vec<String>) -> (Option<String>, Option<String>) {
     let mut valid_count_1 = 0;
     let mut valid_count_2 = 0;
 
@@ -149,10 +149,10 @@ pub fn day04(input: &[String]) -> Option<String> {
             }
         }
     }
-    Some(format!("{},{}",valid_count_1,valid_count_2))
+    (Some(valid_count_1.to_string()), Some(valid_count_2.to_string()))
 }
 
-pub fn day05(input: &[String]) -> Option<String> {
+pub fn day05(input: Vec<String>) -> (Option<String>, Option<String>) {
     let mut max_seat_id: i32 = 0;
     let seats: Vec<i32> = input.iter().map( |line| {
         let mut number: i32 = 0;
@@ -168,11 +168,10 @@ pub fn day05(input: &[String]) -> Option<String> {
         if seats.contains(&(nr-1)) && !seats.contains(&(nr)) && seats.contains(&(nr+1)) { break nr; }
         if nr >= 1024 { break -1; } else { nr += 1; }
     };
-
-    Some(format!("{},{}",max_seat_id, my_seat_id))
+    (Some(max_seat_id.to_string()), Some(my_seat_id.to_string()))
 }
 
-pub fn day06(input: &[String]) -> Option<String> {
+pub fn day06(input: Vec<String>) -> (Option<String>, Option<String>) {
     const ALPHABET: [char; 26] = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
     let mut input_iter = input.iter();
     let mut any_sum = 0;
@@ -192,11 +191,11 @@ pub fn day06(input: &[String]) -> Option<String> {
             all_yes = line.unwrap().chars().filter( |x| all_yes.contains(x) ).collect();
         }
     }
-    Some(format!("{},{}", any_sum, all_sum))
+    (Some(any_sum.to_string()), Some(all_sum.to_string()))
 }
 
 
-pub fn day07(input: &[String]) -> Option<String> {
+pub fn day07(input: Vec<String>) -> (Option<String>, Option<String>) {
     fn bag_contains_gold(rules: &HashMap<String,Vec<(i32,String)>>, bag: &str) -> bool {
         for sub_bag in rules.get(bag).unwrap_or(&Vec::new()) {
             if sub_bag.1 == "shiny gold" || bag_contains_gold(rules, &sub_bag.1) { return true; }
@@ -213,23 +212,68 @@ pub fn day07(input: &[String]) -> Option<String> {
     
     let mut rules: HashMap<String,Vec<(i32,String)>> = HashMap::new();
     for mut words in input.iter().map(|x| x.split(' ').peekable()) {
-        let bag = format!("{} {}",words.next()?, words.next()?);
+        let bag = format!("{} {}",words.next().unwrap(), words.next().unwrap());
         let mut contain = Vec::<(i32,String)>::new();
         words.next();
         words.next();
         while words.peek().is_some() {
             if words.peek() == Some(&"no") { break; }
             contain.push((
-                words.next().map(|x| x.parse::<i32>().expect("invalid number"))?,
-                format!("{} {}", words.next()?, words.next()?),
+                words.next().map(|x| x.parse::<i32>().expect("invalid number")).unwrap(),
+                format!("{} {}", words.next().unwrap(), words.next().unwrap()),
             ));
             words.next();
         }
         rules.insert(bag, contain);
     };
     
-    Some(format!("{},{}",
-        rules.keys().filter(|x| bag_contains_gold(&rules, x) ).count(),
-        count_bags(&rules, &String::from("shiny gold")) -1,
-    ))
+    (
+        Some(rules.keys().filter(|x| bag_contains_gold(&rules, x) ).count().to_string()),
+        Some((count_bags(&rules, &String::from("shiny gold")) -1).to_string()),
+    )
+}
+
+pub fn day08(input: Vec<String>) -> (Option<String>, Option<String>) {
+    enum RunResult {
+        Terminate(i32),
+        Loop(i32,i32),
+    }
+    fn run(mut input: Vec<String>) -> RunResult {
+        let mut line = 0i32;
+        let mut val = 0i32;
+        while let Some(instruction) = input.get_mut(line as usize) {
+            match (instruction.get(..3),instruction.get(4..).and_then(|x| x.parse::<i32>().ok()))  {
+                (Some("acc"), Some(i)) => { line += 1; val += i; },
+                (Some("jmp"), Some(i)) => { line += i; },
+                (Some("nop"), Some(_)) => { line += 1; },
+                _ => break,
+            }
+            *instruction = String::from("");
+        }
+        if line as usize == input.len() {
+            RunResult::Terminate(val)
+        } else {
+            RunResult::Loop(val, line)
+        }
+    
+    }
+    let result1 = match run(input.clone()) {
+        RunResult::Loop(val,_) => val,
+        _ => -1,
+    };
+
+    let mut result2 = -1;
+    for (idx, val) in input.iter().enumerate() {
+        let mut fixed = input.clone();
+        fixed[idx as usize] = match (val.get(..3),val.get(4..))  {
+            (Some("jmp"), Some(i)) => format!("nop {}", i),
+            (Some("nop"), Some(i)) => format!("jmp {}", i),
+            _ => continue,
+        };
+        if let RunResult::Terminate(i) = run(fixed) {
+            result2 = i;
+            break;
+        }
+    }
+    (Some(result1.to_string()), Some(result2.to_string()))
 }

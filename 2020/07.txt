@@ -1,5 +1,4 @@
-7
-372,8015
+7,372,8015
 posh teal bags contain 2 faded coral bags, 3 striped crimson bags, 1 faded red bag.
 mirrored chartreuse bags contain 3 clear beige bags, 3 shiny silver bags, 3 bright green bags.
 dotted red bags contain 4 light chartreuse bags.
