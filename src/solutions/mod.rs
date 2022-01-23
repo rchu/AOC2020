@@ -4,8 +4,6 @@ use crate::Puzzle;
 mod day1_;
 mod day;
 
-fn between<T: std::cmp::PartialOrd>(value: T, low: T, high: T) -> bool { (low <= value) && (value <= high) }
-
 impl Puzzle {
     pub fn solve(&mut self)  {
         let input = mem::take(&mut self.input);

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::collections::HashMap;
 
-use super::between;
+
 
 pub fn day01(input: Vec<String>) -> (Option<String>, Option<String>) {
     let numbers: Vec<u32> = input
@@ -103,6 +103,8 @@ pub fn day03(input: Vec<String>) -> (Option<String>, Option<String>) {
 }
 
 pub fn day04(input: Vec<String>) -> (Option<String>, Option<String>) {
+    fn between<T: std::cmp::PartialOrd>(value: T, low: T, high: T) -> bool { (low <= value) && (value <= high) }
+    
     let mut valid_count_1 = 0;
     let mut valid_count_2 = 0;
 
@@ -193,7 +195,6 @@ pub fn day06(input: Vec<String>) -> (Option<String>, Option<String>) {
     }
     (Some(any_sum.to_string()), Some(all_sum.to_string()))
 }
-
 
 pub fn day07(input: Vec<String>) -> (Option<String>, Option<String>) {
     fn bag_contains_gold(rules: &HashMap<String,Vec<(i32,String)>>, bag: &str) -> bool {
