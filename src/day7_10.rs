@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::cmp::Ordering::{Greater, Equal};
 use anyhow::{Result, Context};
-
 use crate::puzzle::Puzzle;
 impl Puzzle {
     pub fn day07(&mut self) {
