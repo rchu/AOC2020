@@ -11,7 +11,7 @@ impl Puzzle {
         'outer1: for i1 in 0..numbers.len() {
             for i2 in (i1+1)..numbers.len() {
                 if numbers[i1] + numbers[i2] == 2020 {
-                    self.answer_a(numbers[i1] * numbers[i2]);
+                    self.set_answer_a(numbers[i1] * numbers[i2]);
                     break 'outer1;
                 }
             }
@@ -21,7 +21,7 @@ impl Puzzle {
             for i2 in (i1+1)..(numbers.len()) {
                 for i3 in (i2+1)..numbers.len() {
                     if numbers[i1] + numbers[i2] + numbers[i3] == 2020 {
-                        self.answer_b(numbers[i1] * numbers[i2] * numbers[i3]);
+                        self.set_answer_b(numbers[i1] * numbers[i2] * numbers[i3]);
                         break 'outer2;
                     } 
                 }
@@ -61,8 +61,8 @@ impl Puzzle {
                 (line.chars().nth(pos+num2  ).unwrap() == chr)
             ) as i32
         }
-        self.answer_a(valid_count_1);
-        self.answer_b(valid_count_2);
+        self.set_answer_a(valid_count_1);
+        self.set_answer_b(valid_count_2);
     }
 
     pub fn day03(&mut self) {
@@ -95,8 +95,8 @@ impl Puzzle {
                 .filter(|&i| Some('#') == map.get(i*dx, i*dy) )
                 .count()
             ).collect();
-        self.answer_a(slopes[1]);
-        self.answer_b(slopes.into_iter().product::<usize>());
+        self.set_answer_a(slopes[1]);
+        self.set_answer_b(slopes.into_iter().product::<usize>());
     }
 
     pub fn day04(&mut self) {
@@ -148,8 +148,8 @@ impl Puzzle {
                 }
             }
         }
-        self.answer_a(valid_count_1);
-        self.answer_b(valid_count_2);
+        self.set_answer_a(valid_count_1);
+        self.set_answer_b(valid_count_2);
     }
 
     pub fn day05(&mut self) {
@@ -168,8 +168,8 @@ impl Puzzle {
             if seats.contains(&(nr-1)) && !seats.contains(&(nr)) && seats.contains(&(nr+1)) { break nr; }
             if nr >= 1024 { break -1; } else { nr += 1; }
         };
-        self.answer_a(max_seat_id);
-        self.answer_b(my_seat_id);
+        self.set_answer_a(max_seat_id);
+        self.set_answer_b(my_seat_id);
     }
 
     pub fn day06(&mut self)  {
@@ -192,7 +192,7 @@ impl Puzzle {
                 all_yes = line.unwrap().chars().filter( |x| all_yes.contains(x) ).collect();
             }
         }
-        self.answer_a(any_sum);
-        self.answer_b(all_sum);
+        self.set_answer_a(any_sum);
+        self.set_answer_b(all_sum);
     }
 }

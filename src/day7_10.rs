@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 use std::cmp::Ordering::{Greater, Equal};
+use anyhow::{Result, Context};
 
 use crate::puzzle::Puzzle;
 impl Puzzle {
-
-   
     pub fn day07(&mut self) {
         fn bag_contains_gold(rules: &HashMap<String,Vec<(i32,String)>>, bag: &str) -> bool {
             for sub_bag in rules.get(bag).unwrap_or(&Vec::new()) {
@@ -37,8 +36,8 @@ impl Puzzle {
             rules.insert(bag, contain);
         };
         
-        self.answer_a(rules.keys().filter(|x| bag_contains_gold(&rules, x) ).count());
-        self.answer_b(count_bags(&rules, &String::from("shiny gold")) -1);
+        self.set_answer_a(rules.keys().filter(|x| bag_contains_gold(&rules, x) ).count());
+        self.set_answer_b(count_bags(&rules, &String::from("shiny gold")) -1);
         
     }
 
@@ -55,18 +54,14 @@ impl Puzzle {
                     (Some("acc"), Some(i)) => { line += 1; val += i; },
                     (Some("jmp"), Some(i)) => { line += i; },
                     (Some("nop"), Some(_)) => { line += 1; },
-                    _ => break,
+                    _ => { return RunResult::Loop(val, line); },
                 }
                 *instruction = String::from("");
             }
-            if line as usize == input.len() {
-                RunResult::Terminate(val)
-            } else {
-                RunResult::Loop(val, line)
-            }
+            RunResult::Terminate(val)
         }
         
-        self.answer_a(match run(self.input.clone()) {
+        self.set_answer_a(match run(self.input.clone()) {
             RunResult::Loop(val,_) => val,
             _ => -1,
         });
@@ -79,17 +74,14 @@ impl Puzzle {
                 _ => continue,
             };
             if let RunResult::Terminate(i) = run(fixed) {
-                self.answer_b(i);
+                self.set_answer_b(i);
                 break;
             }
         }
     }
 
-    pub fn day09(&mut self) {
-        let numbers = self.input
-            .iter()
-            .map(|x| x.parse::<i64>().expect("parse int error"))
-            .collect::<Vec<i64>>();
+    pub fn day09(&mut self) -> Result<()> {
+        let numbers = self.get_input_as::<i64>()?;
 
         let mut invalid = 0;
         'outer1: for i in 25..numbers.len() {
@@ -102,7 +94,7 @@ impl Puzzle {
 
             }
             invalid = i;
-            self.answer_a(numbers[i]);
+            self.set_answer_a(numbers[i]);
             break;        
         }
 
@@ -114,11 +106,12 @@ impl Puzzle {
                     Equal => {
                         let mut min = numbers[num2];
                         let mut max = numbers[num2];
-                        for i in num2+1..num1 {
+                        #[allow(clippy::needless_range_loop)]
+                        for i in num2+1..num1 { 
                             if numbers[i] < min { min = numbers[i]; }
                             if numbers[i] > max { max = numbers[i]; }
                         }
-                        self.answer_b(min + max);
+                        self.set_answer_b(min + max);
                         break 'outer2;
                     }
                     Greater => {
@@ -128,5 +121,29 @@ impl Puzzle {
                 }
             }
         };
+        Ok(())
+    }
+
+    pub fn day10(&mut self) -> Result<()> {
+        let mut adapters = self.get_input_as::<i32>().with_context(|| "Cannot parse input")?;
+        adapters.push(0);
+        adapters.sort_unstable();
+        adapters.push(*adapters.last().unwrap()+3);
+        
+        let mut diff = [0,0,0,0];
+        for i in 0..adapters.len()-1 {
+            diff[(adapters[i+1] - adapters[i]) as usize] += 1;
+        }
+        self.set_answer_a(diff[1] * diff[3]);
+
+        let mut paths = vec![1i64; adapters.len()];
+        for idx in (0..adapters.len()-1).rev() {
+            paths[idx] = (idx+1..adapters.len()).take(3)
+                .filter( |&target| adapters[target] - adapters[idx] <= 3)
+                .map( |target| paths[target])
+                .sum();
+        }
+        self.set_answer_b(paths[0]);
+        Ok(())
     }
 }
