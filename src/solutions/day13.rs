@@ -1,5 +1,6 @@
-use std::{usize};
+use std::usize;
 use anyhow::{Result, Context, anyhow, Error};
+
 use crate::puzzle::Puzzle;
 impl Puzzle {
     pub fn day13a(&mut self) -> Result<()> {
@@ -21,26 +22,26 @@ impl Puzzle {
         self.set_answer_a(busses.get(0).ok_or_else(|| anyhow!("No busses found"))?.1);
         Ok(())
     }
+    
     pub fn day13b(&mut self) -> Result<()> {
         let busses = self.input
             .get(1).ok_or(anyhow!("Cannot read second line"))?
-            .split(',').enumerate().filter(|&x| x.1 != "x")
-            .map(|x| 
-                x.1.parse::<usize>().context("Cannot parse bus ID").map(|x1| (x1, x.0))
-            )
+            .split(',').enumerate()
+            .filter(|&x| x.1 != "x").map(|x| 
+                x.1.parse::<usize>().context("Cannot parse bus ID").map(|x1| (x1, x.0)) )
             .collect::<Result<Vec<(usize,usize)>,Error>>()?;
 
-        let mut interval = 1;
-        let mut prod_bus_time = 1;
+        let mut time = 1;
+        let mut busid_product = 1;
         for bus in busses.iter() {
-            let mut new_interval = interval;
-            interval = loop {
-                if (new_interval + bus.1) % bus.0 == 0 { break new_interval; }
-                new_interval += prod_bus_time;
+            let mut new_time = time;
+            time = loop {
+                if (new_time + bus.1) % bus.0 == 0 { break new_time; }
+                new_time += busid_product;
             };
-            prod_bus_time *= bus.0;
+            busid_product *= bus.0;
         }
-        self.set_answer_b(interval);  
+        self.set_answer_b(time);  
         Ok(())
     }
 }

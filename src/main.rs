@@ -1,21 +1,21 @@
 mod puzzle;
-mod day1_6;
-mod day7_10;
-mod day11_12;
-mod day13_;
+mod solutions;
 use puzzle::Puzzle;
 use std::env::args;
-use anyhow::Result;
 
-fn main() -> Result<()> {
+
+fn main() {
     println!("\x1b[33m* \x1b[32mAdvent of Code\x1b[33m *\x1b[0m\n");    
     if args().count() < 2 {
         println!("Please tell me which file(s) to look at");
     } 
     for arg in args().skip(1){
-        Puzzle::from_file(&arg)?
-        .solve()?
-        .print_result()
+        match Puzzle::from_file(&arg) {
+            Ok(mut p) => match p.solve() {
+                Ok(p) => p.print_result(),
+                Err(e) => println!("  \x1b[32m Day {}\x1b[0m \x1b[31m{}\x1b[0m", p.day, e),
+            },
+            Err(e) =>  println!("  \x1b[32m Day ??\x1b[0m {}: \x1b[31m{}\x1b[0m",arg, e),
+        };
     }
-    Ok(())
 }
