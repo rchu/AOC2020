@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.53"
-array_tool = "1"
+array_tool = "1.0.3"
