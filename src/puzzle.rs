@@ -98,6 +98,7 @@ impl Puzzle {
             14 => self.day14()?,
             15 => self.day15()?,
             16 => self.day16()?,
+            17 => self.day17()?,
             _ => bail!("No solver found for day {}",self.day),
         }
         self.time = now.elapsed().as_secs_f64();
