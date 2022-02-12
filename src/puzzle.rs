@@ -100,7 +100,7 @@ impl Puzzle {
             16 => self.day16()?,
             17 => self.day17()?,
             18 => self.day18()?,
-            // 19 => self.day19()?,
+            19 => self.day19()?,
             // 20 => self.day20()?,
             // 21 => self.day21()?,
             // 22 => self.day22()?,
