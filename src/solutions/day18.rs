@@ -131,7 +131,7 @@ fn parse_math_part2(mut chars: Chars) -> Result<i64> {
             num_lhs = None;
         }
     }
-    if muls.len() > 0 {
+    if !muls.is_empty() {
         Ok(muls.iter().product::<i64>() * num_rhs.unwrap_or(0))
     } else {
         num_rhs.ok_or_else(|| anyhow!("unexpected EOL"))
