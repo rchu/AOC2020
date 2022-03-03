@@ -96,9 +96,8 @@ impl MessageRules {
         self.one = HashMap::new();
         self
     }
-    /// tries left-first to expand from the starting rule 
-    fn valid_message(&self, goal: &[char], msg: &[u16]) -> Result<bool> {
-        let mut idx = 0;
+    /// tries left-first to expand from the starting rule. idx: the index to start workin (i.e. left from idx everything equals the goal)
+    fn valid_message(&self, goal: &[char], msg: &[u16], mut idx: usize) -> Result<bool> {
         // Search for leftmost expandable number
         while let Some(number) = msg.get(idx) {
             if idx >= goal.len() { return Ok(false); }
@@ -117,7 +116,7 @@ impl MessageRules {
                 new.push(replacement.0);
                 new.push(replacement.1);
                 new.append(&mut msg.get(idx+1..).ok_or_else(|| anyhow!("cannot get tail slice {}.. of msg {:?}",idx+1,msg))?.to_vec());
-                if let Ok(true) = self.valid_message(goal, &new) { return Ok(true); }    
+                if let Ok(true) = self.valid_message(goal, &new, idx) { return Ok(true); }    
             }
         }
         // No replacement worked
@@ -157,7 +156,7 @@ impl Puzzle {
         let rules_part1 = MessageRules::from_input(&rules)?.cnf();
         let mut valid: i32 = 0;
         for message in &messages {
-            if rules_part1.valid_message(&message.chars().collect::<Vec<char>>(), &[0])? {
+            if rules_part1.valid_message(&message.chars().collect::<Vec<char>>(), &[0],0)? {
                 valid += 1; }}
         self.set_answer_a(valid);
 
@@ -170,7 +169,7 @@ impl Puzzle {
         let rules_part2= MessageRules::from_input(&rules)?.cnf();
         valid = 0;
         for message in messages {
-            if rules_part2.valid_message(&message.chars().collect::<Vec<char>>(), &[0])? {
+            if rules_part2.valid_message(&message.chars().collect::<Vec<char>>(), &[0],0)? {
                 valid += 1; }}
         self.set_answer_b(valid);
         Ok(())
