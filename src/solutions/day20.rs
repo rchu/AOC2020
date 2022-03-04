@@ -280,6 +280,7 @@ impl JigsawPuzzle {
         std::io::stdout().flush().unwrap();
     }
     fn print_clear(&self) {
+        if !VERBOSE {return}
         for _ in 0..self.size*TILE_HALF {
             up(1);
             print!("{:>1$}",' ',self.size*TILE_SIZE);

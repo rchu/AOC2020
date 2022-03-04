@@ -2,13 +2,13 @@
 use std::{io::BufRead, time::Instant};
 use std::io;
 use std::fs::File;
-use anyhow::{anyhow, Result, Error, Context, bail};
+use anyhow::{Result, Error, Context, bail};
 
 pub struct Puzzle  {
     pub file: String,
     pub day: i32,
-    pub answer_a: Option<String>,
-    pub answer_b: Option<String>,
+    pub answer_a: String,
+    pub answer_b: String,
     pub input: Vec<String>,
     pub output_a: Option<String>,
     pub output_b: Option<String>,
@@ -18,16 +18,16 @@ pub struct Puzzle  {
 impl Puzzle {
     pub fn from_file(file_name: &str) -> Result<Self> {
         let mut lines = io::BufReader::new( File::open(file_name)? ).lines();
-        let mut items = lines.next().ok_or(anyhow!("Input file contains no lines"))??
-            .split(',')
-            .map(String::from)
-            .collect::<Vec<String>>()
-            .into_iter();
+        // let mut items = lines.next().ok_or(anyhow!("Input file contains no lines"))??
+        //     .split(',')
+        //     .map(String::from)
+        //     .collect::<Vec<String>>()
+        //     .into_iter();
         Ok(Self {
             file: file_name.to_string(),
-            day: items.next().unwrap().parse::<i32>().context("Unable to parse puzzle number from input file")?,
-            answer_a: items.next(),
-            answer_b: items.next(),  
+            day: lines.next().unwrap()?.parse::<i32>().context("Unable to parse puzzle number from input file")?,
+            answer_a: lines.next().unwrap()?,
+            answer_b: lines.next().unwrap()?,  
             input: lines.collect::<Result<Vec<String>, _>>()?,
             output_a: None,
             output_b: None,
@@ -38,11 +38,11 @@ impl Puzzle {
 
     pub fn print_result(&self) {
         let (star_a, out_a) = if let Some(out) = &self.output_a {
-            if let Some(ans) = &self.answer_a {
-                if ans == out {
-                    ('★', format!("\x1b[32m'{}'\x1b[0m is correct",ans))
+            if !self.answer_a.is_empty() {
+                if &self.answer_a == out {
+                    ('★', format!("\x1b[32m'{}'\x1b[0m is correct",self.answer_a))
                 } else {
-                    (' ', format!("'{}', got \x1b[31m{}\x1b[0m", ans, out))
+                    (' ', format!("'{}', got \x1b[31m{}\x1b[0m", self.answer_a, out))
                 }
             } else {
                 ('☆', format!("\x1b[33m{}\x1b[0m may be correct", out))
@@ -51,11 +51,11 @@ impl Puzzle {
             (' ', "got \x1b[31mnothing\x1b[0m".to_string())
         };
         let (star_b, out_b) = if let Some(out) = &self.output_b {
-            if let Some(ans) = &self.answer_b {
-                if ans == out {
-                    ('★', format!("\x1b[32m'{}'\x1b[0m is correct",ans))
+            if !self.answer_b.is_empty() {
+                if &self.answer_b == out {
+                    ('★', format!("\x1b[32m'{}'\x1b[0m is correct",self.answer_b))
                 } else {
-                    (' ', format!("'{}', got \x1b[31m{}\x1b[0m", ans, out))
+                    (' ', format!("'{}', got \x1b[31m{}\x1b[0m", self.answer_b, out))
                 }
             } else {
                 ('☆', format!("\x1b[33m{}\x1b[0m may be correct", out))
@@ -102,7 +102,7 @@ impl Puzzle {
             18 => self.day18()?,
             19 => self.day19()?,
             20 => self.day20()?,
-            // 21 => self.day21()?,
+            21 => self.day21()?,
             // 22 => self.day22()?,
             // 23 => self.day23()?,
             // 24 => self.day24()?,

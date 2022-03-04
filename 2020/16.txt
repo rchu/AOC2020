@@ -1,4 +1,6 @@
-16,27850,491924517533
+16
+27850
+491924517533
 departure location: 47-691 or 713-954
 departure station: 44-776 or 799-969
 departure platform: 37-603 or 627-953
