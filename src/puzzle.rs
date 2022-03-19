@@ -106,7 +106,7 @@ impl Puzzle {
             22 => self.day22()?,
             23 => self.day23()?,
             24 => self.day24()?,
-            // 25 => self.day25()?,
+            25 => self.day25()?,
             _ => bail!("No solver found for day {}",self.day),
         }
         self.time = now.elapsed().as_secs_f64();
