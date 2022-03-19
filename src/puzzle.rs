@@ -105,7 +105,7 @@ impl Puzzle {
             21 => self.day21()?,
             22 => self.day22()?,
             23 => self.day23()?,
-            // 24 => self.day24()?,
+            24 => self.day24()?,
             // 25 => self.day25()?,
             _ => bail!("No solver found for day {}",self.day),
         }
